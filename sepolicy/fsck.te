@@ -1,2 +1,2 @@
-# Run fsck on certain block devices
-allow fsck persist_block_device:blk_file rw_file_perms;
+#============= fsck ==============
+allow fsck persist_block_device:blk_file { ioctl open getattr read write };

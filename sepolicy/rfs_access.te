@@ -1,0 +1,5 @@
+#============= rfs_access ==============
+allow rfs_access rmt_debugfs:dir search;
+allow rfs_access rmt_debugfs:file { write open };
+allow rfs_access self:capability net_raw;
+

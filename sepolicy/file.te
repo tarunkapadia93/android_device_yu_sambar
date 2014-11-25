@@ -2,3 +2,4 @@ type data_silead_file, file_type;
 type silead_fp_device, dev_type;
 type data_silead_file_tmp, file_type;
 type touchscreen_file, sysfs_type, file_type;
+type rmt_debugfs, fs_type;

@@ -5474,7 +5474,9 @@ int32_t QCameraParameters::initDefaultParameters()
         info.freeram);
     if (info.totalram > TOTAL_RAM_SIZE_512MB) {
         set(KEY_QC_LONGSHOT_SUPPORTED, VALUE_TRUE);
-        set(KEY_QC_ZSL_HDR_SUPPORTED, VALUE_TRUE);
+        /* Report as unsupported on Sambar. It's buggy and provides almost no
+           benefit. */
+        set(KEY_QC_ZSL_HDR_SUPPORTED, VALUE_FALSE);
     } else {
         set(KEY_QC_LONGSHOT_SUPPORTED, VALUE_FALSE);
         set(KEY_QC_ZSL_HDR_SUPPORTED, VALUE_FALSE);

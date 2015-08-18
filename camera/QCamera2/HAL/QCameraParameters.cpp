@@ -5850,7 +5850,9 @@ int32_t QCameraParameters::setPreviewFpsRange(int min_fps,
             " vid minFps = %d, vid maxFps = %d",
             __func__, min_fps, max_fps, vid_min_fps, vid_max_fps);
 
-    if ( NULL != m_AdjustFPS ) {
+    /* Disable thermal FPS adjustment for HFR since it breaks the mode completely.
+       CPU will still throttle as necessary and frames will just be dropped. */
+    if ( NULL != m_AdjustFPS && !isHfrMode()) {
         m_AdjustFPS->recalcFPSRange(min_fps, max_fps, fps_range);
         CDBG_HIGH("%s: Thermal adjusted Preview fps range %3.2f,%3.2f, %3.2f, %3.2f",
               __func__, fps_range.min_fps, fps_range.max_fps,

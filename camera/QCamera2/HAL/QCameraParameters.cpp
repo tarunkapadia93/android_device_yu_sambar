@@ -1548,6 +1548,12 @@ int32_t QCameraParameters::setLiveSnapshotSize(const QCameraParameters& params)
     // use picture size from user setting
     params.getPictureSize(&m_LiveSnapshotSize.width, &m_LiveSnapshotSize.height);
 
+    memset(&m_VideoPictureSize, 0, sizeof(m_VideoPictureSize));
+    reduceLiveSnapshotSize(params, m_LiveSnapshotSize);
+    if (m_VideoPictureSize.width > 0 && m_VideoPictureSize.height > 0) {
+        m_LiveSnapshotSize = m_VideoPictureSize;
+    }
+
     size_t livesnapshot_sizes_tbl_cnt =
             m_pCapability->livesnapshot_sizes_tbl_cnt;
     cam_dimension_t *livesnapshot_sizes_tbl =
@@ -1648,6 +1654,43 @@ int32_t QCameraParameters::setLiveSnapshotSize(const QCameraParameters& params)
     return NO_ERROR;
 }
 
+/*===========================================================================
+ * FUNCTION   : reduceLiveSnapshotSize
+ *
+ * DESCRIPTION: Reduce the livesnapshot size based on the Aspect ratio of Video
+ *
+ * PARAMETERS : params: user setting parameters, size: picture size
+ *
+ * RETURN     : none
+ *==========================================================================*/
+ void QCameraParameters::reduceLiveSnapshotSize(const QCameraParameters& params, const cam_dimension_t size)
+{
+    bool found = false;
+    int width, height;
+    double videoAspectRatio;
+
+    params.getVideoSize(&width, &height);
+    if (size.width == width && size.height == height) return;
+
+    videoAspectRatio = (double) width / height;
+    for (size_t i = 0; i < m_pCapability->picture_sizes_tbl_cnt; ++i) {
+        double ratio = (double) m_pCapability->picture_sizes_tbl[i].width / m_pCapability->picture_sizes_tbl[i].height;
+        if (fabs(ratio - videoAspectRatio) > ASPECT_TOLERANCE) continue;
+        if (m_pCapability->picture_sizes_tbl[i].width > size.width ||
+            m_pCapability->picture_sizes_tbl[i].height > size.height) continue;
+        if (m_pCapability->picture_sizes_tbl[i].width <= width
+                && m_pCapability->picture_sizes_tbl[i].height <= height) {
+            m_VideoPictureSize = m_pCapability->picture_sizes_tbl[i];
+            found = true;
+            CDBG_HIGH("reduce size as %d x %d", m_VideoPictureSize.width, m_VideoPictureSize.height);
+            break;
+        }
+    }
+
+    if (!found) {
+        ALOGW("[May] No picture size match the aspect ratio, keep to use origin size");
+    }
+}
 
 /*===========================================================================
  * FUNCTION   : setRawSize

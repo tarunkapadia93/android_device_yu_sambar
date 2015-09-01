@@ -949,6 +949,7 @@ private:
     int32_t updateParamEntry(const char *key, const char *value);
     int32_t commitParamChanges();
     void updateViewAngles();
+    void reduceLiveSnapshotSize(const QCameraParameters& params, const cam_dimension_t size);
 
     // Map from strings to values
     static const cam_dimension_t THUMBNAIL_SIZES_MAP[];
@@ -1017,6 +1018,7 @@ private:
     bool m_bSnapshotFlipChanged;       // if flip setting for snapshot changed
     bool m_bFixedFrameRateSet;      // Indicates that a fixed frame rate is set
     qcamera_thermal_mode m_ThermalMode; // adjust fps vs adjust frameskip
+    cam_dimension_t m_VideoPictureSize; //reduce livesnapshot size for video recording
     cam_dimension_t m_LiveSnapshotSize; // live snapshot size
     cam_dimension_t m_rawSize; // live snapshot size
     bool m_bHDREnabled;             // if HDR is enabled

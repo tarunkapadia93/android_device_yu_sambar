@@ -1448,6 +1448,7 @@ typedef enum {
     CAM_INTF_META_FACE_DETECTION,
     /* Whether optical image stabilization is enabled. */
     CAM_INTF_META_LENS_OPT_STAB_MODE,
+    CAM_INTF_PARM_PDAF_ENABLE,
 
     /* specific to HAl1 */
     CAM_INTF_META_AUTOFOCUS_DATA,

@@ -166,8 +166,10 @@ public:
     static const char KEY_QC_SUPPORTED_MEM_COLOR_ENHANCE_MODES[];
     static const char KEY_QC_DIS[];
     static const char KEY_QC_OIS[];
+    static const char KEY_QC_PDAF[];
     static const char KEY_QC_SUPPORTED_DIS_MODES[];
     static const char KEY_QC_SUPPORTED_OIS_MODES[];
+    static const char KEY_QC_SUPPORTED_PDAF_MODES[];
 
     static const char KEY_QC_ZSL[];
     static const char KEY_QC_SUPPORTED_ZSL_MODES[];
@@ -667,6 +669,7 @@ public:
     bool isDISEnabled();
     cam_is_type_t getISType();
     uint8_t getMobicatMask();
+    bool getPDAFValue() {return m_bPDAFEnabled;};
 
     cam_focus_mode_type getFocusMode() const {return mFocusMode;};
     bool isAFRunning();
@@ -817,6 +820,8 @@ private:
     int32_t setAwbLock(const QCameraParameters& );
     int32_t setMCEValue(const QCameraParameters& );
     int32_t setDISValue(const QCameraParameters& params);
+    int32_t setOISValue(const QCameraParameters& params);
+    int32_t setPDAF(const QCameraParameters& params);
     int32_t setLensShadeValue(const QCameraParameters& );
     int32_t setExposureCompensation(const QCameraParameters& );
     int32_t setWhiteBalance(const QCameraParameters& );
@@ -883,6 +888,8 @@ private:
     int32_t setAwbLock(const char *awbStr);
     int32_t setMCEValue(const char *mceStr);
     int32_t setDISValue(const char *disStr);
+    int32_t setOISValue(const char *oisStr);
+    int32_t setPDAF(const char *oisStr);
     int32_t setHighFrameRate(const int32_t hfrMode);
     int32_t setLensShadeValue(const char *lensShadeStr);
     int32_t setExposureCompensation(int expComp);
@@ -1015,6 +1022,7 @@ private:
     bool m_bAVTimerEnabled;    //if AVTimer is enabled
     bool m_bDISEnabled;
     bool m_bOISEnabled;
+    bool m_bPDAFEnabled;
     cam_still_more_t m_stillmore_config;
 
     uint8_t m_MobiMask;

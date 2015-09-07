@@ -2321,15 +2321,19 @@ int QCamera2HardwareInterface::startPreview()
         if (focusMode == CAM_FOCUS_MODE_CONTINOUS_PICTURE)
             mCameraHandle->ops->cancel_auto_focus(mCameraHandle->camera_handle);
     }
-    updatePostPreviewParameters();
+    if (mParameters.getPDAFValue() == true)
+        updatePostPreviewParameters(false);
+    else
+        updatePostPreviewParameters(true);
     CDBG_HIGH("%s: X", __func__);
     return rc;
 }
 
-int32_t QCamera2HardwareInterface::updatePostPreviewParameters() {
+int32_t QCamera2HardwareInterface::updatePostPreviewParameters(bool oisValue) {
     // Enable OIS only in Camera mode and 4k2k camcoder mode
     int32_t rc = NO_ERROR;
-    rc = mParameters.updateOisValue(1);
+    ALOGE("%s: OisValue: %d", __func__, (int)oisValue);
+    rc = mParameters.updateOisValue(oisValue);
     return NO_ERROR;
 }
 
@@ -3076,6 +3080,9 @@ int QCamera2HardwareInterface::takePicture()
     }
     CDBG_HIGH("%s: [ZSL Retro] numSnapshots = %d, numRetroSnapshots = %d",
           __func__, numSnapshots, numRetroSnapshots);
+
+    if (!mParameters.isZSLMode())
+        updatePostPreviewParameters(true);
 
     if (mParameters.isZSLMode()) {
         QCameraPicChannel *pZSLChannel =

@@ -93,8 +93,10 @@ const char QCameraParameters::KEY_QC_MEMORY_COLOR_ENHANCEMENT[] = "mce";
 const char QCameraParameters::KEY_QC_SUPPORTED_MEM_COLOR_ENHANCE_MODES[] = "mce-values";
 const char QCameraParameters::KEY_QC_DIS[] = "dis";
 const char QCameraParameters::KEY_QC_OIS[] = "ois";
+const char QCameraParameters::KEY_QC_PDAF[] = "pdaf";
 const char QCameraParameters::KEY_QC_SUPPORTED_DIS_MODES[] = "dis-values";
 const char QCameraParameters::KEY_QC_SUPPORTED_OIS_MODES[] = "ois-values";
+const char QCameraParameters::KEY_QC_SUPPORTED_PDAF_MODES[] = "pdaf-values";
 const char QCameraParameters::KEY_QC_VIDEO_HIGH_FRAME_RATE[] = "video-hfr";
 const char QCameraParameters::KEY_QC_VIDEO_HIGH_SPEED_RECORDING[] = "video-hsr";
 const char QCameraParameters::KEY_QC_SUPPORTED_VIDEO_HIGH_FRAME_RATE_MODES[] = "video-hfr-values";
@@ -802,6 +804,8 @@ QCameraParameters::QCameraParameters()
       m_bHDREnabled(false),
       m_bAVTimerEnabled(false),
       m_bDISEnabled(false),
+      m_bOISEnabled(false),
+      m_bPDAFEnabled(false),
       m_MobiMask(0),
       m_AdjustFPS(NULL),
       m_bHDR1xFrameEnabled(true),
@@ -3126,6 +3130,56 @@ int32_t QCameraParameters::setDISValue(const QCameraParameters& params)
 }
 
 /*===========================================================================
+ * FUNCTION   : setOISValue
+ *
+ * DESCRIPTION: enable/disable OIS from user setting
+ *
+ * PARAMETERS :
+ *   @params  : user setting parameters
+ *
+ * RETURN     : int32_t type of status
+ *              NO_ERROR  -- success
+ *              none-zero failure code
+ *==========================================================================*/
+int32_t QCameraParameters::setOISValue(const QCameraParameters& params)
+{
+    const char *str = params.get(KEY_QC_OIS);
+    const char *prev_str = get(KEY_QC_OIS);
+    if (str != NULL) {
+        if (prev_str == NULL ||
+            strcmp(str, prev_str) != 0) {
+            return setOISValue(str);
+        }
+    }
+    return NO_ERROR;
+}
+
+/*===========================================================================
+ * FUNCTION   : setPDAF
+ *
+ * DESCRIPTION: enable/disable PDAF from user setting
+ *
+ * PARAMETERS :
+ *   @params  : user setting parameters
+ *
+ * RETURN     : int32_t type of status
+ *              NO_ERROR  -- success
+ *              none-zero failure code
+ *==========================================================================*/
+int32_t QCameraParameters::setPDAF(const QCameraParameters& params)
+{
+    const char *str = params.get(KEY_QC_PDAF);
+    const char *prev_str = get(KEY_QC_PDAF);
+    if (str != NULL) {
+        if (prev_str == NULL ||
+            strcmp(str, prev_str) != 0) {
+            return setPDAF(str);
+        }
+    }
+    return NO_ERROR;
+}
+
+/*===========================================================================
  * FUNCTION   : setLensShadeValue
  *
  * DESCRIPTION: set lens shade value from user setting
@@ -3827,6 +3881,11 @@ int32_t QCameraParameters::setRecordingHint(const QCameraParameters& params)
                     CDBG_HIGH("%s: %d: Setting scene mode to auto", __func__, __LINE__);
                     setSceneMode(SCENE_MODE_AUTO);
                 }
+                if (m_bPDAFEnabled) {
+                    CDBG_HIGH("%s: %d: Setting PDAF value again", __func__, __LINE__);
+                    setPDAF(VALUE_ENABLE);
+                }
+
                 if (m_bDISEnabled) {
                     CDBG_HIGH("%s: %d: Setting DIS value again", __func__, __LINE__);
                     setDISValue(VALUE_ENABLE);
@@ -4540,6 +4599,8 @@ int32_t QCameraParameters::updateParameters(QCameraParameters& params,
     if ((rc = setAwbLock(params)))                      final_rc = rc;
     if ((rc = setLensShadeValue(params)))               final_rc = rc;
     if ((rc = setMCEValue(params)))                     final_rc = rc;
+    if ((rc = setPDAF(params)))                     final_rc = rc;
+    if ((rc = setOISValue(params)))                     final_rc = rc;
     if ((rc = setDISValue(params)))                     final_rc = rc;
     if ((rc = setAntibanding(params)))                  final_rc = rc;
     if ((rc = setExposureCompensation(params)))         final_rc = rc;
@@ -5246,6 +5307,14 @@ int32_t QCameraParameters::initDefaultParameters()
     // Set MCE
     set(KEY_QC_SUPPORTED_MEM_COLOR_ENHANCE_MODES, enableDisableValues);
     setMCEValue(VALUE_ENABLE);
+
+    // Set PDAF
+    set(KEY_QC_SUPPORTED_PDAF_MODES, enableDisableValues);
+    setPDAF(VALUE_ENABLE);
+
+    // Set OIS
+    set(KEY_QC_SUPPORTED_OIS_MODES, enableDisableValues);
+    setOISValue(VALUE_ENABLE);
 
     // Set DIS
     set(KEY_QC_SUPPORTED_DIS_MODES, enableDisableValues);
@@ -7075,6 +7144,12 @@ int32_t QCameraParameters::setDISValue(const char *disStr)
         int32_t value = lookupAttr(ENABLE_DISABLE_MODES_MAP,
                 PARAM_MAP_SIZE(ENABLE_DISABLE_MODES_MAP), disStr);
         if (value != NAME_NOT_FOUND) {
+            //If OIS enabled and PDAF disabled, DIS cann't enable!
+            if (m_bOISEnabled && !m_bPDAFEnabled && !m_bDISEnabled)
+            {
+                ALOGE("%s: Don't setting DIS: m_bOISEnabled(%d) m_bDISEnabled(%d)", __func__, m_bOISEnabled, m_bDISEnabled);
+                return NO_ERROR;
+            }
             //For some IS types (like EIS 2.0), when DIS value is changed, we need to restart
             //preview because of topology change in backend. But, for now, restart preview
             //for all IS types.
@@ -7094,6 +7169,94 @@ int32_t QCameraParameters::setDISValue(const char *disStr)
     }
     ALOGE("Invalid DIS value: %s", (disStr == NULL) ? "NULL" : disStr);
     m_bDISEnabled = false;
+    return BAD_VALUE;
+}
+
+/*===========================================================================
+ * FUNCTION   : setOISValue
+ *
+ * DESCRIPTION: set OIS value
+ *
+ * PARAMETERS :
+ *   @oisStr : OIS value string
+ *
+ * RETURN     : int32_t type of status
+ *              NO_ERROR  -- success
+ *              none-zero failure code
+ *==========================================================================*/
+int32_t QCameraParameters::setOISValue(const char *oisStr)
+{
+    if (oisStr != NULL) {
+        int32_t value = lookupAttr(ENABLE_DISABLE_MODES_MAP,
+                PARAM_MAP_SIZE(ENABLE_DISABLE_MODES_MAP), oisStr);
+        int32_t rc = NO_ERROR;
+        if (value != NAME_NOT_FOUND) {
+            m_bNeedRestart = true;
+            CDBG_HIGH("%s: Setting OIS value %s", __func__, oisStr);
+            updateParamEntry(KEY_QC_OIS, oisStr);
+            if (!(strcmp(oisStr,"enable"))) {
+                m_bOISEnabled = true;
+                //rc = updateOisValue(true);
+                if (!m_bPDAFEnabled)
+                {
+                    CDBG_HIGH("%s: %d: Disable DIS!!", __func__, __LINE__);
+                    setDISValue(VALUE_DISABLE);
+                }
+            } else {
+                m_bOISEnabled = false;
+                //rc = updateOisValue(false);
+            }
+            if (rc != NO_ERROR) {
+                return BAD_VALUE;
+            }
+            return NO_ERROR;
+        }
+    }
+    ALOGE("Invalid OIS value: %s", (oisStr == NULL) ? "NULL" : oisStr);
+    m_bOISEnabled = false;
+    return BAD_VALUE;
+}
+
+/*===========================================================================
+ * FUNCTION   : setPDAF
+ *
+ * DESCRIPTION: set PDAF
+ *
+ * PARAMETERS :
+ *   @pdafStr : PDAF value string
+ *
+ * RETURN     : int32_t type of status
+ *              NO_ERROR  -- success
+ *              none-zero failure code
+ *==========================================================================*/
+int32_t QCameraParameters::setPDAF(const char *pdafStr)
+{
+    if (pdafStr != NULL) {
+        int32_t value = lookupAttr(ENABLE_DISABLE_MODES_MAP,
+                PARAM_MAP_SIZE(ENABLE_DISABLE_MODES_MAP), pdafStr);
+        int32_t rc = NO_ERROR;
+        if (value != NAME_NOT_FOUND) {
+            m_bNeedRestart = true;
+            CDBG_HIGH("%s: Setting PDAF value %s", __func__, pdafStr);
+            updateParamEntry(KEY_QC_PDAF, pdafStr);
+            if (!(strcmp(pdafStr,"enable"))) {
+                m_bPDAFEnabled = true;
+            } else {
+                m_bPDAFEnabled = false;
+                if (m_bOISEnabled)
+                {
+                    CDBG_HIGH("%s: %d: Disable DIS!!", __func__, __LINE__);
+                    setDISValue(VALUE_DISABLE);
+                }
+            }
+            if (ADD_SET_PARAM_ENTRY_TO_BATCH(m_pParamBuf, CAM_INTF_PARM_PDAF_ENABLE, value)) {
+                return BAD_VALUE;
+            }
+            return NO_ERROR;
+        }
+    }
+    ALOGE("Invalid PDAF value: %s", (pdafStr == NULL) ? "NULL" : pdafStr);
+    m_bPDAFEnabled = false;
     return BAD_VALUE;
 }
 
@@ -7121,24 +7284,28 @@ int32_t QCameraParameters::updateOisValue(bool oisValue)
     uint8_t ois_disable = (uint8_t)atoi(ois_prop);
 
     //Enable OIS if it is camera mode or Camcoder 4K mode
-    if (!m_bRecordingHint || (is4k2kVideoResolution() && m_bRecordingHint)) {
+    //if (!m_bRecordingHint || (is4k2kVideoResolution() && m_bRecordingHint)) {
+    //Enable OIS
+    if (m_bOISEnabled && oisValue) {
         enable = 1;
         CDBG_HIGH("%s: Valid OIS mode!! ", __func__);
     }
     // Disable OIS if setprop is set
-    if (ois_disable || !oisValue) {
+    if (ois_disable || !oisValue || !m_bOISEnabled) {
         //Disable OIS
         enable = 0;
-        CDBG_HIGH("%s: Disable OIS mode!! ois_disable(%d) oisValue(%d)",
-                __func__, ois_disable, oisValue);
+        CDBG_HIGH("%s: Disable OIS mode!! ois_disable(%d) oisValue(%d) m_bOISEnabled(%d)",
+                __func__, ois_disable, oisValue, m_bOISEnabled);
 
     }
+    /*
     m_bOISEnabled = enable;
     if (m_bOISEnabled) {
         updateParamEntry(KEY_QC_OIS, VALUE_ENABLE);
     } else {
         updateParamEntry(KEY_QC_OIS, VALUE_DISABLE);
     }
+    */
 
     if (initBatchUpdate(m_pParamBuf) < 0 ) {
         ALOGE("%s:Failed to initialize group update table", __func__);
@@ -9919,6 +10086,11 @@ int32_t QCameraParameters::updateRecordingHintValue(int32_t value)
     if (rc != NO_ERROR) {
         ALOGE("%s:Failed to update table", __func__);
         return rc;
+    }
+
+    if(m_bPDAFEnabled && (value==1)) {
+        CDBG_HIGH("%s: %d: Setting PDAF value again!!", __func__, __LINE__);
+        setPDAF(VALUE_ENABLE);
     }
 
     if(m_bDISEnabled && (value==1)) {

@@ -1670,7 +1670,7 @@ int32_t QCameraParameters::setLiveSnapshotSize(const QCameraParameters& params)
     double videoAspectRatio;
 
     params.getVideoSize(&width, &height);
-    if (size.width == width && size.height == height) return;
+    if (size.width <= width && size.height <= height) return;
 
     videoAspectRatio = (double) width / height;
     for (size_t i = 0; i < m_pCapability->picture_sizes_tbl_cnt; ++i) {

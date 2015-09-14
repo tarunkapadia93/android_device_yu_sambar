@@ -236,6 +236,7 @@ private:
             metadata_buffer_t *hal_metadata);
     int32_t extractSceneMode(const CameraMetadata &frame_settings, uint8_t metaMode,
             metadata_buffer_t *hal_metadata);
+    int32_t enablePDAFbyMode(const CameraMetadata &frame_settings, uint8_t metaMode);
 
     void updatePowerHint(bool bWasVideo, bool bIsVideo);
 
@@ -270,6 +271,7 @@ private:
     bool m_bIs4KVideo;
     bool m_bEisSupportedSize;
     bool m_bEisEnable;
+    bool m_bPdafEnable;
     uint8_t m_MobicatMask;
     int8_t  m_overrideAppFaceDetection;
 

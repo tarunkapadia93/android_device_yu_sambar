@@ -140,7 +140,8 @@ const QCamera3HardwareInterface::QCameraMap<
     { ANDROID_CONTROL_SCENE_MODE_SPORTS ,        CAM_SCENE_MODE_SPORTS },
     { ANDROID_CONTROL_SCENE_MODE_PARTY,          CAM_SCENE_MODE_PARTY },
     { ANDROID_CONTROL_SCENE_MODE_CANDLELIGHT,    CAM_SCENE_MODE_CANDLELIGHT },
-    { ANDROID_CONTROL_SCENE_MODE_BARCODE,        CAM_SCENE_MODE_BARCODE}
+    { ANDROID_CONTROL_SCENE_MODE_BARCODE,        CAM_SCENE_MODE_BARCODE},
+    { ANDROID_CONTROL_SCENE_MODE_HDR,            CAM_SCENE_MODE_HDR}
 };
 
 const QCamera3HardwareInterface::QCameraMap<
@@ -308,6 +309,7 @@ QCamera3HardwareInterface::QCamera3HardwareInterface(uint32_t cameraId,
       m_bIs4KVideo(false),
       m_bEisSupportedSize(false),
       m_bEisEnable(false),
+      m_bPdafEnable(true),
       m_MobicatMask(0),
       mMinProcessedFrameDuration(0),
       mMinJpegFrameDuration(0),
@@ -2409,6 +2411,22 @@ int QCamera3HardwareInterface::processCaptureRequest(
             if (rc != NO_ERROR) {
                 ALOGE("%s: extractSceneMode failed", __func__);
             }
+            rc = enablePDAFbyMode(meta, metaMode);
+            if (rc != NO_ERROR) {
+                ALOGE("%s: enablePDAFbyMode failed", __func__);
+            }
+        }
+
+        //Set pdaf parameter
+        int32_t pdafMode;
+        //turn it off for video
+        if ((mCaptureIntent ==  CAMERA3_TEMPLATE_VIDEO_RECORD) ||
+             (mCaptureIntent == CAMERA3_TEMPLATE_VIDEO_SNAPSHOT))
+             m_bPdafEnable = false;
+        pdafMode = (m_bPdafEnable) ? 1 : 0;
+        ALOGE("hal3_pdaf: Set pdaf param: pdafMode(%d)", pdafMode);
+        if (ADD_SET_PARAM_ENTRY_TO_BATCH(mParameters, CAM_INTF_PARM_PDAF_ENABLE, pdafMode)) {
+            rc = BAD_VALUE;
         }
         /*set the capture intent, hal version, tintless, stream info,
          *and disenable parameters to the backend*/
@@ -6034,14 +6052,14 @@ camera_metadata_t* QCamera3HardwareInterface::translateCapabilityToMetadata(int 
         tonemap_mode = ANDROID_TONEMAP_MODE_FAST;
         controlIntent = ANDROID_CONTROL_CAPTURE_INTENT_MANUAL;
         focusMode = ANDROID_CONTROL_AF_MODE_OFF;
-        optStabMode = ANDROID_LENS_OPTICAL_STABILIZATION_MODE_OFF;
+        optStabMode = ANDROID_LENS_OPTICAL_STABILIZATION_MODE_ON;
         break;
       default:
         edge_mode = ANDROID_EDGE_MODE_FAST;
         noise_red_mode = ANDROID_NOISE_REDUCTION_MODE_FAST;
         tonemap_mode = ANDROID_TONEMAP_MODE_FAST;
         controlIntent = ANDROID_CONTROL_CAPTURE_INTENT_CUSTOM;
-        optStabMode = ANDROID_LENS_OPTICAL_STABILIZATION_MODE_OFF;
+        optStabMode = ANDROID_LENS_OPTICAL_STABILIZATION_MODE_ON;
         break;
     }
     settings.update(ANDROID_CONTROL_CAPTURE_INTENT, &controlIntent, 1);
@@ -6851,6 +6869,8 @@ int QCamera3HardwareInterface::translateToHalMetadata
     if (frame_settings.exists(ANDROID_LENS_OPTICAL_STABILIZATION_MODE)) {
         uint8_t optStabMode =
                 frame_settings.find(ANDROID_LENS_OPTICAL_STABILIZATION_MODE).data.u8[0];
+        optStabMode = (m_bPdafEnable) ? 0 : optStabMode;
+        ALOGE("hal3_pdaf: Set OIS mode: m_bPdafEnable(%d) optStabMode(%d)", m_bPdafEnable, optStabMode);
         if (ADD_SET_PARAM_ENTRY_TO_BATCH(mParameters, CAM_INTF_META_LENS_OPT_STAB_MODE, optStabMode)) {
             rc = BAD_VALUE;
         }
@@ -7606,6 +7626,71 @@ int32_t QCamera3HardwareInterface::extractSceneMode(
         rc = BAD_VALUE;
     }
     CDBG("%s: sceneMode: %d hfrMode: %d", __func__, sceneMode, hfrMode);
+
+    return rc;
+}
+
+/*===========================================================================
+ * FUNCTION   : enablePDAFbyMode
+ *
+ * DESCRIPTION: Extract scene mode from frameworks set metadata
+ *
+ * PARAMETERS :
+ *      @frame_settings: CameraMetadata reference
+ *      @metaMode: ANDROID_CONTORL_MODE
+ *      @hal_metadata: hal metadata structure
+ *
+ * RETURN     : Success : 0
+ *              Failure : BAD_VALUE in case of bad input
+ *==========================================================================*/
+int32_t QCamera3HardwareInterface::enablePDAFbyMode(
+        const CameraMetadata &frame_settings, uint8_t metaMode)
+{
+    int32_t sceneMode, hfrMode, pdafMode;
+    int32_t rc = NO_ERROR;
+
+    sceneMode = CAM_SCENE_MODE_OFF;
+    hfrMode = CAM_HFR_MODE_OFF;
+    pdafMode = FALSE;
+    if (metaMode == ANDROID_CONTROL_MODE_USE_SCENE_MODE) {
+        camera_metadata_ro_entry entry =
+                frame_settings.find(ANDROID_CONTROL_SCENE_MODE);
+        if (0 == entry.count)
+            return rc;
+
+        uint8_t fwk_sceneMode = entry.data.u8[0];
+
+        if (fwk_sceneMode != ANDROID_CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO) {
+            sceneMode = lookupHalName(SCENE_MODES_MAP,
+                    sizeof(SCENE_MODES_MAP)/sizeof(SCENE_MODES_MAP[0]),
+                    fwk_sceneMode);
+            if (NAME_NOT_FOUND == sceneMode)
+                sceneMode = CAM_SCENE_MODE_OFF;
+            hfrMode = CAM_HFR_MODE_OFF;
+        }
+    } else {
+        sceneMode = CAM_SCENE_MODE_OFF;
+        hfrMode = CAM_HFR_MODE_OFF;
+    }
+
+    switch (sceneMode)
+    {
+        case CAM_SCENE_MODE_OFF:
+        case CAM_SCENE_MODE_FACE_PRIORITY:
+        case CAM_SCENE_MODE_PORTRAIT:
+        case CAM_SCENE_MODE_LANDSCAPE:
+        case CAM_SCENE_MODE_BEACH:
+        case CAM_SCENE_MODE_SNOW:
+        case CAM_SCENE_MODE_BARCODE:
+            pdafMode = TRUE;
+            break;
+        default:
+            pdafMode = FALSE;
+            break;
+    }
+    m_bPdafEnable = (pdafMode > 0) ? true : false;
+
+    ALOGE("hal3_pdaf: %s: sceneMode: %d hfrMode: %d pdafMode: %d", __func__, sceneMode, hfrMode, pdafMode);
 
     return rc;
 }

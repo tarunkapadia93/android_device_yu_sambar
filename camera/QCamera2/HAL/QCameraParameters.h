@@ -746,6 +746,7 @@ public:
     int32_t updateDebugLevel();
     bool is4k2kVideoResolution();
     int getBrightness();
+    int32_t checkPDAFmode();
     int32_t updateOisValue(bool oisValue);
     int32_t setIntEvent(cam_int_evt_params_t params);
     void setOfflineRAW();
@@ -1044,6 +1045,7 @@ private:
     bool m_bSceneSelection;
     Mutex m_SceneSelectLock;
     cam_scene_mode_type m_SelectedScene;
+    cam_scene_mode_type m_SetScene;
     bool m_bSeeMoreOn;
     bool m_bStillMoreOn;
     cam_fps_range_t m_hfrFpsRange;

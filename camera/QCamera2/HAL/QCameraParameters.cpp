@@ -821,6 +821,7 @@ QCameraParameters::QCameraParameters()
       m_bOptiZoomOn(false),
       m_bSceneSelection(false),
       m_SelectedScene(CAM_SCENE_MODE_MAX),
+      m_SetScene(CAM_SCENE_MODE_MAX),
       m_bSeeMoreOn(false),
       m_bStillMoreOn(false),
       m_bHfrMode(false),
@@ -925,6 +926,7 @@ QCameraParameters::QCameraParameters(const String8 &params)
     m_bOptiZoomOn(false),
     m_bSceneSelection(false),
     m_SelectedScene(CAM_SCENE_MODE_MAX),
+    m_SetScene(CAM_SCENE_MODE_MAX),
     m_bSeeMoreOn(false),
     m_bStillMoreOn(false),
     m_bHfrMode(false),
@@ -3935,10 +3937,6 @@ int32_t QCameraParameters::setRecordingHint(const QCameraParameters& params)
                     CDBG_HIGH("%s: %d: Setting scene mode to auto", __func__, __LINE__);
                     setSceneMode(SCENE_MODE_AUTO);
                 }
-                if (m_bPDAFEnabled) {
-                    CDBG_HIGH("%s: %d: Setting PDAF value again", __func__, __LINE__);
-                    setPDAF(VALUE_ENABLE);
-                }
 
                 if (m_bDISEnabled) {
                     CDBG_HIGH("%s: %d: Setting DIS value again", __func__, __LINE__);
@@ -4699,6 +4697,7 @@ int32_t QCameraParameters::updateParameters(QCameraParameters& params,
     if ((rc = setStillMore(params)))                    final_rc = rc;
 
     if ((rc = updateFlash(false)))                      final_rc = rc;
+    if ((rc = checkPDAFmode()))                         final_rc = rc;
 
 UPDATE_PARAM_DONE:
     needRestart = m_bNeedRestart;
@@ -7319,6 +7318,64 @@ int32_t QCameraParameters::setPDAF(const char *pdafStr)
 }
 
 /*===========================================================================
+ * FUNCTION   : checkPDAFmode
+ *
+ * DESCRIPTION: check PDAF mode
+ *
+ * PARAMETERS :
+ *
+ * RETURN     : int32_t type of status
+ *              NO_ERROR  -- success
+ *              none-zero failure code
+ *==========================================================================*/
+int32_t QCameraParameters::checkPDAFmode()
+{
+
+    if (m_bRecordingHint_new)
+    {
+        CDBG_HIGH("%s: %d: Setting PDAF off in movie mode", __func__, __LINE__);
+        setPDAF(VALUE_DISABLE);
+    }
+    else
+    {
+        if (m_SetScene >= CAM_SCENE_MODE_MAX)
+        {
+            ALOGE("Invalid mode value: %d", m_SetScene);
+            return BAD_VALUE;
+        }
+        switch (m_SetScene)
+        {
+            case CAM_SCENE_MODE_OFF:
+            case CAM_SCENE_MODE_PORTRAIT:
+            case CAM_SCENE_MODE_LANDSCAPE:
+            case CAM_SCENE_MODE_BEACH:
+            case CAM_SCENE_MODE_SNOW:
+            case CAM_SCENE_MODE_AUTO:
+            case CAM_SCENE_MODE_AR:
+                CDBG_HIGH("%s: %d: Setting PDAF on, mode(%d)", __func__, __LINE__, m_SetScene);
+                setPDAF(VALUE_ENABLE);
+                break;
+            default:
+                CDBG_HIGH("%s: %d: Setting PDAF off, mode(%d)", __func__, __LINE__, m_SetScene);
+                setPDAF(VALUE_DISABLE);
+                break;
+        }
+        if (isHDREnabled())
+        {
+            CDBG_HIGH("%s: %d: Setting PDAF off in hdr mode", __func__, __LINE__);
+            setPDAF(VALUE_DISABLE);
+        }
+        if (m_bOptiZoomOn || m_bChromaFlashOn)
+        {
+            CDBG_HIGH("%s: %d: Setting PDAF off, m_bOptiZoomOn(%d), m_bChromaFlashOn(%d)", __func__, __LINE__, m_bOptiZoomOn, m_bChromaFlashOn);
+            setPDAF(VALUE_DISABLE);
+        }
+    }
+
+    return NO_ERROR;
+}
+
+/*===========================================================================
  * FUNCTION   : updateOisValue
  *
  * DESCRIPTION: update OIS value
@@ -7909,6 +7966,7 @@ int32_t QCameraParameters::setSceneMode(const char *sceneModeStr)
         if (value != NAME_NOT_FOUND) {
             CDBG("%s: Setting SceneMode %s", __func__, sceneModeStr);
             updateParamEntry(KEY_SCENE_MODE, sceneModeStr);
+            m_SetScene = (cam_scene_mode_type) value;
             if (m_bSensorHDREnabled) {
               // Incase of HW HDR mode, we do not update the same as Best shot mode.
               CDBG_HIGH("%s: H/W HDR mode enabled. Do not set Best Shot Mode", __func__);
@@ -7921,6 +7979,7 @@ int32_t QCameraParameters::setSceneMode(const char *sceneModeStr)
                     (uint32_t)value)) {
                 return BAD_VALUE;
             }
+
             return NO_ERROR;
         }
     }
@@ -10147,8 +10206,8 @@ int32_t QCameraParameters::updateRecordingHintValue(int32_t value)
     }
 
     if(m_bPDAFEnabled && (value==1)) {
-        CDBG_HIGH("%s: %d: Setting PDAF value again!!", __func__, __LINE__);
-        setPDAF(VALUE_ENABLE);
+        CDBG_HIGH("%s: %d: Setting PDAF off!!", __func__, __LINE__);
+        setPDAF(VALUE_DISABLE);
     }
 
     if(m_bDISEnabled && (value==1)) {

@@ -1814,19 +1814,22 @@ int32_t QCameraParameters::setJpegThumbnailSize(const QCameraParameters& params)
         // just honor setting supplied by application.
 
         // Try to find a size matches aspect ratio and has the largest width
-        for (size_t i = 0; i < sizes_cnt; i++) {
-            if (THUMBNAIL_SIZES_MAP[i].height == 0) {
-                // No thumbnail case, just skip
-                continue;
-            }
-            double ratio =
-                (double)THUMBNAIL_SIZES_MAP[i].width / THUMBNAIL_SIZES_MAP[i].height;
-            if (fabs(ratio - picAspectRatio) > ASPECT_TOLERANCE)  {
-                continue;
-            }
-            if (THUMBNAIL_SIZES_MAP[i].width > optimalWidth) {
-                optimalWidth = THUMBNAIL_SIZES_MAP[i].width;
-                optimalHeight = THUMBNAIL_SIZES_MAP[i].height;
+        if((width > dim.width) || (height > dim.height)) {
+            //do this only for invalid thumbnail requests
+            for (size_t i = 0; i < sizes_cnt; i++) {
+                if (THUMBNAIL_SIZES_MAP[i].height == 0) {
+                    // No thumbnail case, just skip
+                    continue;
+                }
+                double ratio =
+                    (double)THUMBNAIL_SIZES_MAP[i].width / THUMBNAIL_SIZES_MAP[i].height;
+                if (fabs(ratio - picAspectRatio) > ASPECT_TOLERANCE)  {
+                    continue;
+                }
+                if (THUMBNAIL_SIZES_MAP[i].width > optimalWidth) {
+                    optimalWidth = THUMBNAIL_SIZES_MAP[i].width;
+                    optimalHeight = THUMBNAIL_SIZES_MAP[i].height;
+                }
             }
         }
 

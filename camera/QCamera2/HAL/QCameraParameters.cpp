@@ -4705,8 +4705,8 @@ int32_t QCameraParameters::updateParameters(QCameraParameters& params,
     if ((rc = setAwbLock(params)))                      final_rc = rc;
     if ((rc = setLensShadeValue(params)))               final_rc = rc;
     if ((rc = setMCEValue(params)))                     final_rc = rc;
-    if ((rc = setPDAF(params)))                     final_rc = rc;
-    if ((rc = setOISValue(params)))                     final_rc = rc;
+    //if ((rc = setPDAF(params)))                         final_rc = rc;
+    //if ((rc = setOISValue(params)))                     final_rc = rc;
     if ((rc = setDISValue(params)))                     final_rc = rc;
     if ((rc = setAntibanding(params)))                  final_rc = rc;
     if ((rc = setExposureCompensation(params)))         final_rc = rc;
@@ -5416,11 +5416,11 @@ int32_t QCameraParameters::initDefaultParameters()
     setMCEValue(VALUE_ENABLE);
 
     // Set PDAF
-    set(KEY_QC_SUPPORTED_PDAF_MODES, enableDisableValues);
+    //set(KEY_QC_SUPPORTED_PDAF_MODES, enableDisableValues);
     setPDAF(VALUE_ENABLE);
 
     // Set OIS
-    set(KEY_QC_SUPPORTED_OIS_MODES, enableDisableValues);
+    //set(KEY_QC_SUPPORTED_OIS_MODES, enableDisableValues);
     setOISValue(VALUE_ENABLE);
 
     // Set DIS
@@ -7345,8 +7345,9 @@ int32_t QCameraParameters::setPDAF(const char *pdafStr)
     if (pdafStr != NULL) {
         int32_t value = lookupAttr(ENABLE_DISABLE_MODES_MAP,
                 PARAM_MAP_SIZE(ENABLE_DISABLE_MODES_MAP), pdafStr);
-        int32_t rc = NO_ERROR;
         if (value != NAME_NOT_FOUND) {
+            if ((value > 0 &&  m_bPDAFEnabled == true) || (value == 0 && m_bPDAFEnabled == false))
+                return NO_ERROR;
             m_bNeedRestart = true;
             CDBG_HIGH("%s: Setting PDAF value %s", __func__, pdafStr);
             updateParamEntry(KEY_QC_PDAF, pdafStr);
@@ -7390,12 +7391,17 @@ int32_t QCameraParameters::checkPDAFmode()
         CDBG_HIGH("%s: %d: Setting PDAF off in movie mode", __func__, __LINE__);
         setPDAF(VALUE_DISABLE);
     }
+    else if (!m_bZslMode_new)
+    {
+        CDBG_HIGH("%s: %d: Setting PDAF on in non-zsl mode", __func__, __LINE__);
+        setPDAF(VALUE_ENABLE);
+    }
     else
     {
         if (m_SetScene >= CAM_SCENE_MODE_MAX)
         {
             ALOGE("Invalid mode value: %d", m_SetScene);
-            return BAD_VALUE;
+            return NO_ERROR;
         }
         switch (m_SetScene)
         {

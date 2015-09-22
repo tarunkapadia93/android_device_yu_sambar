@@ -667,6 +667,7 @@ public:
     int32_t updateRAW(cam_dimension_t max_dim);
     bool isAVTimerEnabled();
     bool isDISEnabled();
+    bool isPDAFEnabled() {return m_bPDAFEnabled;};
     cam_is_type_t getISType();
     uint8_t getMobicatMask();
     bool getPDAFValue() {return m_bPDAFEnabled;};

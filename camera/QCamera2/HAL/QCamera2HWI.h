@@ -657,6 +657,7 @@ private:
     uint32_t mInputCount;
     bool mAdvancedCaptureConfigured;
     bool mHDRBracketingEnabled;
+    bool mbOISValue;
 #ifdef USE_MEDIA_EXTENSIONS
     QCameraVideoMemory *mVideoMem;
 #endif

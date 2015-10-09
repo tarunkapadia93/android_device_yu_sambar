@@ -3088,9 +3088,6 @@ int QCamera2HardwareInterface::takePicture()
     CDBG_HIGH("%s: [ZSL Retro] numSnapshots = %d, numRetroSnapshots = %d",
           __func__, numSnapshots, numRetroSnapshots);
 
-    if (!mParameters.isZSLMode())
-        updatePostPreviewParameters(true);
-
     if (mParameters.isZSLMode()) {
         QCameraPicChannel *pZSLChannel =
             (QCameraPicChannel *)m_channels[QCAMERA_CH_TYPE_ZSL];

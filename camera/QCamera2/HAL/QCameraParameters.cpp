@@ -7389,11 +7389,6 @@ int32_t QCameraParameters::checkPDAFmode()
         CDBG_HIGH("%s: %d: Setting PDAF off in movie mode", __func__, __LINE__);
         setPDAF(VALUE_DISABLE);
     }
-    else if (!m_bZslMode_new)
-    {
-        CDBG_HIGH("%s: %d: Setting PDAF on in non-zsl mode", __func__, __LINE__);
-        setPDAF(VALUE_ENABLE);
-    }
     else
     {
         if (m_SetScene >= CAM_SCENE_MODE_MAX)

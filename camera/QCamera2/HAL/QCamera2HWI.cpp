@@ -4502,13 +4502,6 @@ int32_t QCamera2HardwareInterface::processAEInfo(cam_3a_params_t &ae_params)
     pthread_mutex_lock(&m_parm_lock);
     mParameters.updateAEInfo(ae_params);
     pthread_mutex_unlock(&m_parm_lock);
-    if (mParameters.isPDAFEnabled())
-    {
-        if (ae_params.exp_time * 1000.0 > 100)
-            updatePostPreviewParameters(true);
-        else if (ae_params.exp_time * 1000.0 < 80)
-            updatePostPreviewParameters(false);
-    }
     return NO_ERROR;
 }
 

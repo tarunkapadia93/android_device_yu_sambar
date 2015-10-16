@@ -2035,9 +2035,15 @@ int32_t QCameraParameters::setPreviewFpsRange(const QCameraParameters& params)
     int prevMinFps, prevMaxFps, vidMinFps, vidMaxFps;
     int rc = NO_ERROR;
     bool found = false, updateNeeded = false;
+    int maxFpsOverride = 0;
 
     CameraParameters::getPreviewFpsRange(&prevMinFps, &prevMaxFps);
     params.getPreviewFpsRange(&minFps, &maxFps);
+
+    if(maxFps > 20000 && m_bZslMode_new && !m_bRecordingHint_new &&
+       m_pCapability->position == 0) {
+        maxFpsOverride = 20000;
+    }
 
     CDBG_HIGH("%s: FpsRange Values:(%d, %d)", __func__, prevMinFps, prevMaxFps);
     CDBG_HIGH("%s: Requested FpsRange Values:(%d, %d)", __func__, minFps, maxFps);
@@ -2054,12 +2060,13 @@ int32_t QCameraParameters::setPreviewFpsRange(const QCameraParameters& params)
     vidMinFps = (int)m_hfrFpsRange.video_min_fps;
     vidMaxFps = (int)m_hfrFpsRange.video_max_fps;
 
-    if(minFps == prevMinFps && maxFps == prevMaxFps) {
+    if(minFps == prevMinFps && (maxFps == prevMaxFps || maxFpsOverride == prevMaxFps)) {
         if ( m_bFixedFrameRateSet ) {
             minFps = params.getPreviewFrameRate() * 1000;
             maxFps = params.getPreviewFrameRate() * 1000;
             m_bFixedFrameRateSet = false;
-        } else if (!updateNeeded) {
+        } else if (!updateNeeded && m_bZslMode == m_bZslMode_new &&
+                   m_bRecordingHint == m_bRecordingHint_new) {
             CDBG_HIGH("%s: No change in FpsRange", __func__);
             rc = NO_ERROR;
             goto end;
@@ -2085,7 +2092,7 @@ int32_t QCameraParameters::setPreviewFpsRange(const QCameraParameters& params)
                 vidMaxFps = (int)m_hfrFpsRange.video_max_fps;
             }
 
-            setPreviewFpsRange(minFps, maxFps, vidMinFps, vidMaxFps);
+            setPreviewFpsRange(minFps, maxFpsOverride ? maxFpsOverride : maxFps, vidMinFps, vidMaxFps);
             break;
         }
     }
@@ -5895,7 +5902,7 @@ int32_t QCameraParameters::setPreviewFpsRange(int min_fps,
 
     /* Disable thermal FPS adjustment for HFR since it breaks the mode completely.
        CPU will still throttle as necessary and frames will just be dropped. */
-    if ( NULL != m_AdjustFPS && !isHfrMode()) {
+    if ( NULL != m_AdjustFPS && !isHfrMode() && max_fps >= 24000) {
         m_AdjustFPS->recalcFPSRange(min_fps, max_fps, fps_range);
         CDBG_HIGH("%s: Thermal adjusted Preview fps range %3.2f,%3.2f, %3.2f, %3.2f",
               __func__, fps_range.min_fps, fps_range.max_fps,

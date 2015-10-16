@@ -7398,15 +7398,26 @@ int32_t QCameraParameters::checkPDAFmode()
         }
         switch (m_SetScene)
         {
-            case CAM_SCENE_MODE_OFF:
             case CAM_SCENE_MODE_PORTRAIT:
             case CAM_SCENE_MODE_LANDSCAPE:
             case CAM_SCENE_MODE_BEACH:
             case CAM_SCENE_MODE_SNOW:
-            case CAM_SCENE_MODE_AUTO:
             case CAM_SCENE_MODE_AR:
                 CDBG_HIGH("%s: %d: Setting PDAF on, mode(%d)", __func__, __LINE__, m_SetScene);
                 setPDAF(VALUE_ENABLE);
+                break;
+            case CAM_SCENE_MODE_OFF:
+            case CAM_SCENE_MODE_AUTO:
+                if (m_bZslMode_new)
+                {
+                    CDBG_HIGH("%s: %d: Setting PDAF on in zsl mode, auto-scene", __func__, __LINE__);
+                    setPDAF(VALUE_ENABLE);
+                }
+                else
+                {
+                    CDBG_HIGH("%s: %d: Setting PDAF off in non-zsl mode, auto-scene", __func__, __LINE__);
+                    setPDAF(VALUE_DISABLE);
+                }
                 break;
             default:
                 CDBG_HIGH("%s: %d: Setting PDAF off, mode(%d)", __func__, __LINE__, m_SetScene);

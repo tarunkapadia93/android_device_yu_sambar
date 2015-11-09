@@ -40,6 +40,7 @@
 #include <gralloc_priv.h>
 #include <gui/Surface.h>
 #include <dlfcn.h>
+#include <unistd.h>
 
 #include "QCamera2HWI.h"
 #include "QCameraMem.h"
@@ -3065,6 +3066,12 @@ int QCamera2HardwareInterface::takePicture()
     // Get number of retro-active snapshots
     uint8_t numRetroSnapshots = mParameters.getNumOfRetroSnapshots();
     CDBG_HIGH("%s: E", __func__);
+
+    if (!mParameters.isZSLMode())
+    {
+        updatePostPreviewParameters(true);
+        usleep(100);
+    }
 
     //Set rotation value from user settings as Jpeg rotation
     //to configure back-end modules.

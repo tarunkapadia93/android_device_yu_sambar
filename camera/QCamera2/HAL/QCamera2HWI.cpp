@@ -3070,7 +3070,7 @@ int QCamera2HardwareInterface::takePicture()
     if (!mParameters.isZSLMode())
     {
         updatePostPreviewParameters(true);
-        usleep(100);
+        usleep(70*1000);	//70us*1000=70ms
     }
 
     //Set rotation value from user settings as Jpeg rotation

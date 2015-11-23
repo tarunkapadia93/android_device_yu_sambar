@@ -10285,9 +10285,9 @@ int32_t QCameraParameters::updateRecordingHintValue(int32_t value)
         return rc;
     }
 
-    if(m_bPDAFEnabled && (value==1)) {
-        CDBG_HIGH("%s: %d: Setting PDAF off!!", __func__, __LINE__);
-        setPDAF(VALUE_DISABLE);
+    if(m_bPDAFEnabled == false && (value==1)) {
+        CDBG_HIGH("%s: %d: Setting PDAF on!!", __func__, __LINE__);
+        setPDAF(VALUE_ENABLE);
     }
 
     if(m_bDISEnabled && (value==1)) {

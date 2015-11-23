@@ -2416,6 +2416,7 @@ int QCamera2HardwareInterface::startRecording()
 
         // Set recording hint to TRUE
         mParameters.updateRecordingHintValue(TRUE);
+        updatePostPreviewParameters(true);
         rc = preparePreview();
         if (rc == NO_ERROR) {
             rc = startChannel(QCAMERA_CH_TYPE_PREVIEW);

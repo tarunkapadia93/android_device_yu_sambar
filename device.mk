@@ -251,6 +251,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     com.android.future.usb.accessory
 
+# VR
+PRODUCT_PACKAGES += \
+    vr.msm8994
+
 # Wifi
 PRODUCT_PACKAGES += \
     ipacm \

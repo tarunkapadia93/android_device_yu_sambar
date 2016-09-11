@@ -371,6 +371,12 @@ on boot
     chmod 0660 /sys/class/leds/blue/start_idx
     chmod 0660 /sys/class/leds/rgb/rgb_blink
 
+    # GPU Tuning
+    chown root system /sys/class/kgsl/kgsl-3d0/dispatch/inflight
+    chmod 0660 /sys/class/kgsl/kgsl-3d0/dispatch/inflight
+    chown root system /sys/class/kgsl/kgsl-3d0/dispatch/inflight_low_latency
+    chmod 0660 /sys/class/kgsl/kgsl-3d0/dispatch/inflight_low_latency
+
     write /proc/sys/kernel/sched_boost 1
     write /proc/sys/vm/dirty_ratio 5
     write /proc/sys/vm/dirty_background_ratio 1

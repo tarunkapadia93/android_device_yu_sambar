@@ -52,7 +52,9 @@ persist.sys.dpmd.nsrm=3
 #persist.dpm.loglevel=7825
 
 # Dexopt
-ro.sys.fw.dex2oat_thread_count=4
+dalvik.vm.boot-dex2oat-threads=4
+dalvik.vm.dex2oat-threads=2
+dalvik.vm.image-dex2oat-threads=4
 
 # Display
 debug.composition.type=c2d

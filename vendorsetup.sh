@@ -14,4 +14,6 @@
 # limitations under the License.
 #
 
-add_lunch_combo cm_sambar-userdebug
+add_lunch_combo lineage_sambar-user
+add_lunch_combo lineage_sambar-userdebug
+add_lunch_combo lineage_sambar-eng

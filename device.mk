@@ -27,6 +27,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
     frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
     frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+    frameworks/native/data/etc/android.hardware.fingerprint.xml:system/etc/permissions/android.hardware.fingerprint.xml \
     frameworks/native/data/etc/android.hardware.sensor.barometer.xml:system/etc/permissions/android.hardware.sensor.barometer.xml \
     frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml \
     frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:system/etc/permissions/android.hardware.sensor.gyroscope.xml \
@@ -94,15 +95,15 @@ PRODUCT_PACKAGES += \
     com.dsi.ant.antradio_library \
     libantradio
 
-# Browser
-PRODUCT_PACKAGES += \
-    Gello
-
 # Camera
 PRODUCT_PACKAGES += \
     camera.msm8994 \
     libmm-qcamera \
     Snap
+
+# Browser
+PRODUCT_PACKAGES += \
+	Gello
 
 # Charger
 PRODUCT_PACKAGES += \
@@ -153,6 +154,10 @@ PRODUCT_PACKAGES += \
     libqcomfm_jni \
     qcom.fmradio
 
+#for android_filesystem_config.h
+PRODUCT_PACKAGES += \
+    fs_config_files
+
 # GPS
 PRODUCT_PACKAGES += \
     gps.msm8994
@@ -172,22 +177,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sec_config:system/etc/sec_config
 
-# Keyhandler/Gestures
-PRODUCT_PACKAGES += \
-    com.cyanogenmod.keyhandler \
-    ConfigPanel
-
-PRODUCT_SYSTEM_SERVER_JARS += com.cyanogenmod.keyhandler
-
-# never dexopt the keyhandler
-$(call add-product-dex-preopt-module-config,com.cyanogenmod.keyhandler,disable)
-
 # Keylayout
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
     $(LOCAL_PATH)/keylayout/qpnp_pon.kl:system/usr/keylayout/qpnp_pon.kl \
-    $(LOCAL_PATH)/keylayout/silead-vinput-keypad.kl:system/usr/keylayout/silead-vinput-keypad.kl \
-    $(LOCAL_PATH)/keylayout/silead-vinput-keypad.kcm:system/usr/keychars/silead-vinput-keypad.kcm
+    $(LOCAL_PATH)/keylayout/silead-vinput-keypad.kl:system/usr/keylayout/silead-vinput-keypad.kl
 
 # Keystore
 PRODUCT_PACKAGES += \

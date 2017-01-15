@@ -17,7 +17,7 @@ $(call inherit-product, device/yu/sambar/full_sambar.mk)
 # Inherit some common CM stuff.
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
-PRODUCT_NAME := cm_sambar
+PRODUCT_NAME := lineage_sambar
 BOARD_VENDOR := yu
 TARGET_VENDOR := yu
 PRODUCT_DEVICE := sambar
@@ -30,3 +30,8 @@ PRODUCT_BUILD_PROP_OVERRIDES += TARGET_DEVICE=YUTOPIA PRODUCT_NAME=YUTOPIA
 
 # Ringtones
 TARGET_NEEDS_BOOSTED_SOUNDS := true
+
+# Boot animation
+TARGET_SCREEN_HEIGHT := 2560
+TARGET_SCREEN_WIDTH := 1440
+TARGET_BOOTANIMATION_HALF_RES := true

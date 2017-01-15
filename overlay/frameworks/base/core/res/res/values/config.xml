@@ -340,14 +340,6 @@
          com.android.internal.os.DeviceKeyHandler interface. -->
     <string name="config_deviceKeyHandlerClass" translatable="false">com.cyanogenmod.settings.device.KeyHandler</string>
 
-    <!-- Does the notification LED support multiple colors?
-         Used to decide if the user can change the colors -->
-    <bool name="config_multiColorNotificationLed">true</bool>
-
-    <!-- Does the battery LED support multiple colors?
-         Used to decide if the user can change the colors -->
-    <bool name="config_multiColorBatteryLed">true</bool>
-
     <!-- Is the notification LED intrusive? Used to decide if there should be a disable option -->
     <bool name="config_intrusiveNotificationLed">true</bool>
 
@@ -393,6 +385,4 @@
 
     <integer name="config_buttonBrightnessSettingDefault">0</integer>
 
-    <!-- Our fingerprint reader is not in trust zone, so we can use it only to unlock the device -->
-    <bool name="config_fingerprintRestrictedToSystemAndOwner">true</bool>
 </resources>

@@ -13,7 +13,6 @@ LOCAL_C_INCLUDES += external/icu/icu4c/source/common
 else
 LOCAL_C_INCLUDES += external/icu4c/common
 endif
-LOCAL_C_INCLUDES += external/dhcpcd
 LOCAL_C_INCLUDES += external/libxml2/include
 LOCAL_C_INCLUDES += external/libnetfilter_conntrack/include
 LOCAL_C_INCLUDES += external/libnfnetlink/include
@@ -25,6 +24,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 LOCAL_CFLAGS := -v
 LOCAL_CFLAGS += -DFEATURE_IPA_ANDROID
 LOCAL_CFLAGS += -DDEBUG
+LOCAL_CLANG := false
 
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_CFLAGS += -include bionic/libc/kernel/arch-arm/asm/posix_types.h
@@ -53,12 +53,10 @@ LOCAL_SRC_FILES := IPACM_Main.cpp \
 
 LOCAL_MODULE := ipacm
 LOCAL_MODULE_TAGS := optional
-
 LOCAL_SHARED_LIBRARIES := libipanat
 LOCAL_SHARED_LIBRARIES += libxml2
 LOCAL_SHARED_LIBRARIES += libnfnetlink
 LOCAL_SHARED_LIBRARIES += libnetfilter_conntrack
-LOCAL_SHARED_LIBRARIES += libdhcpcd
 include $(BUILD_EXECUTABLE)
 
 ################################################################################

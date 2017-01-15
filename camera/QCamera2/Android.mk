@@ -34,6 +34,7 @@ LOCAL_SRC_FILES += \
 
 LOCAL_CFLAGS := -Wall -Wextra -Werror
 LOCAL_CFLAGS += -DHAS_MULTIMEDIA_HINTS
+LOCAL_CLANG := false
 
 ifeq ($(TARGET_USES_AOSP),true)
 LOCAL_CFLAGS += -DVANILLA_HAL
@@ -41,6 +42,7 @@ endif
 
 #HAL 1.0 Flags
 LOCAL_CFLAGS += -DDEFAULT_DENOISE_MODE_ON -DHAL3
+LOCAL_CLANG := false
 
 LOCAL_C_INCLUDES := \
         $(LOCAL_PATH)/stack/common \

@@ -1,1 +1,2 @@
-allow sensors persist_file:file rw_file_perms;
+#============= sensors ==============
+allow sensors persist_file:file { open read };

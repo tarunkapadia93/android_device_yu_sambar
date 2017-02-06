@@ -1,0 +1,4 @@
+#============= fpsvcd ==============
+allow fpsvcd fingerprintd:file read;
+allow fpsvcd self:capability { sys_nice dac_override };
+allow fpsvcd system_file:dir { open read };

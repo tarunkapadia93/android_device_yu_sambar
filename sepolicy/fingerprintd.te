@@ -1,0 +1,2 @@
+#============= fingerprintd ==============
+allow fingerprintd fpsvcd:file read;

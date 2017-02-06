@@ -1,3 +1,0 @@
-allow system_server touchscreen_file:file rw_file_perms;
-# thermal-engine reporting
-allow system_server thermal-engine:unix_stream_socket connectto;

@@ -4,6 +4,12 @@ LOCAL_PATH := $(call my-dir)
 include $(LOCAL_PATH)/../../../common.mk
 include $(CLEAR_VARS)
 
+LOCAL_CLANG_CFLAGS += \
+        -Wno-error=memsize-comparison \
+        -Wno-error=missing-field-initializers \
+        -Wno-error=pointer-bool-conversion
+LOCAL_CLANG := false
+
 MM_CAM_FILES := \
         src/mm_camera_interface.c \
         src/mm_camera.c \
@@ -34,13 +40,14 @@ LOCAL_CFLAGS += -DCAMERA_ION_HEAP_ID=ION_IOMMU_HEAP_ID
 LOCAL_C_INCLUDES+= $(kernel_includes)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps)
 
-LOCAL_C_INCLUDES += $(call project-path-for,qcom-media)/mm-core/inc
+LOCAL_C_INCLUDES += hardware/qcom/media-caf-msm8992/mm-core/inc
 
 ifneq (1,$(filter 1,$(shell echo "$$(( $(PLATFORM_SDK_VERSION) >= 17 ))" )))
   LOCAL_CFLAGS += -include bionic/libc/kernel/common/linux/socket.h
   LOCAL_CFLAGS += -include bionic/libc/kernel/common/linux/un.h
 endif
 LOCAL_CFLAGS += -Wall -Wextra -Werror
+LOCAL_CLANG := false
 
 LOCAL_SRC_FILES := $(MM_CAM_FILES)
 
@@ -48,6 +55,7 @@ LOCAL_MODULE           := libmmcamera_interface
 LOCAL_PRELINK_MODULE   := false
 LOCAL_SHARED_LIBRARIES := libdl libcutils liblog
 LOCAL_MODULE_TAGS := optional
+LOCAL_CLANG := false
 
 LOCAL_32_BIT_ONLY := $(BOARD_QTI_CAMERA_32BIT_ONLY)
 include $(BUILD_SHARED_LIBRARY)

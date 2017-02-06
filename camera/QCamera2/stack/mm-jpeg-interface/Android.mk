@@ -5,6 +5,11 @@ include $(LOCAL_PATH)/../../../common.mk
 include $(CLEAR_VARS)
 
 LOCAL_32_BIT_ONLY := $(BOARD_QTI_CAMERA_32BIT_ONLY)
+
+LOCAL_CLANG_CFLAGS += \
+        -Wno-error=unused-variable
+LOCAL_CLANG := false
+
 LOCAL_CFLAGS+= -D_ANDROID_
 
 LOCAL_CFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter
@@ -57,6 +62,7 @@ LOCAL_MODULE           := libmmjpeg_interface
 LOCAL_PRELINK_MODULE   := false
 LOCAL_SHARED_LIBRARIES := libdl libcutils liblog libqomx_core
 LOCAL_MODULE_TAGS := optional
+LOCAL_CLANG := false
 
 LOCAL_32_BIT_ONLY := $(BOARD_QTI_CAMERA_32BIT_ONLY)
 include $(BUILD_SHARED_LIBRARY)

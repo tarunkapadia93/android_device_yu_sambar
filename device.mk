@@ -27,6 +27,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
     frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
     frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+    frameworks/native/data/etc/android.hardware.fingerprint.xml:system/etc/permissions/android.hardware.fingerprint.xml \
     frameworks/native/data/etc/android.hardware.sensor.barometer.xml:system/etc/permissions/android.hardware.sensor.barometer.xml \
     frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml \
     frameworks/native/data/etc/android.hardware.sensor.gyroscope.xml:system/etc/permissions/android.hardware.sensor.gyroscope.xml \
@@ -50,9 +51,30 @@ PRODUCT_AAPT_PREF_CONFIG := xxxhdpi
 # Boot animation
 TARGET_SCREEN_HEIGHT := 2560
 TARGET_SCREEN_WIDTH := 1440
+# Provides overrides to configure the HWUI memory limits
 
-$(call inherit-product, frameworks/native/build/phone-xxxhdpi-3072-dalvik-heap.mk)
-$(call inherit-product, frameworks/native/build/phone-xxxhdpi-3072-hwui-memory.mk)
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.hwui.texture_cache_size=88 \
+    ro.hwui.layer_cache_size=58 \
+    ro.hwui.path_cache_size=32 \
+    ro.hwui.shape_cache_size=4 \
+    ro.hwui.gradient_cache_size=2 \
+    ro.hwui.drop_shadow_cache_size=8 \
+    ro.hwui.r_buffer_cache_size=8 \
+    ro.hwui.text_small_cache_width=2048 \
+    ro.hwui.text_small_cache_height=2048 \
+    ro.hwui.text_large_cache_width=4096 \
+    ro.hwui.text_large_cache_height=4096
+
+# Provides overrides to configure the Dalvik heap for a 3G phone
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    dalvik.vm.heapstartsize=8m \
+    dalvik.vm.heapgrowthlimit=288m \
+    dalvik.vm.heapsize=768m \
+    dalvik.vm.heaptargetutilization=0.75 \
+    dalvik.vm.heapminfree=2m \
+    dalvik.vm.heapmaxfree=8m
 
 # Audio
 PRODUCT_PACKAGES += \
@@ -94,15 +116,10 @@ PRODUCT_PACKAGES += \
     com.dsi.ant.antradio_library \
     libantradio
 
-# Browser
-PRODUCT_PACKAGES += \
-    Gello
-
 # Camera
 PRODUCT_PACKAGES += \
     camera.msm8994 \
-    libmm-qcamera \
-    Snap
+    libmm-qcamera
 
 # Charger
 PRODUCT_PACKAGES += \
@@ -135,11 +152,8 @@ PRODUCT_PACKAGES += \
     libtinyxml \
     memtrack.msm8994
 
-PRODUCT_PROPERTY_OVERRIDES += \
-    dalvik.vm.heapgrowthlimit=256m
-
 PRODUCT_PACKAGES += \
-    fingerprint.msm8994 \
+	fingerprint.msm8994 \
     fingerprintd
 
 # DPM
@@ -149,9 +163,12 @@ PRODUCT_PACKAGES += \
 
 # FM
 PRODUCT_PACKAGES += \
-    FM2 \
-    libqcomfm_jni \
-    qcom.fmradio
+    FMRadio \
+    libfm_jni
+
+#for android_filesystem_config.h
+PRODUCT_PACKAGES += \
+    fs_config_files
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -172,22 +189,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sec_config:system/etc/sec_config
 
-# Keyhandler/Gestures
-PRODUCT_PACKAGES += \
-    com.cyanogenmod.keyhandler \
-    ConfigPanel
-
-PRODUCT_SYSTEM_SERVER_JARS += com.cyanogenmod.keyhandler
-
-# never dexopt the keyhandler
-$(call add-product-dex-preopt-module-config,com.cyanogenmod.keyhandler,disable)
-
 # Keylayout
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
     $(LOCAL_PATH)/keylayout/qpnp_pon.kl:system/usr/keylayout/qpnp_pon.kl \
-    $(LOCAL_PATH)/keylayout/silead-vinput-keypad.kl:system/usr/keylayout/silead-vinput-keypad.kl \
-    $(LOCAL_PATH)/keylayout/silead-vinput-keypad.kcm:system/usr/keychars/silead-vinput-keypad.kcm
+    $(LOCAL_PATH)/keylayout/silead-vinput-keypad.kl:system/usr/keylayout/silead-vinput-keypad.kl
 
 # Keystore
 PRODUCT_PACKAGES += \
@@ -236,15 +242,15 @@ PRODUCT_PACKAGES += \
     init.crda.sh \
     init.qcom.bt.sh \
     init.qcom.coex.sh \
-    init.qcom.fm.sh \
-    init.qcom.post_boot.sh
+    init.qcom.fm.sh
 
 PRODUCT_PACKAGES += \
     fstab.qcom \
     init.qcom.rc \
     init.qcom.usb.rc \
     init.recovery.qcom.rc \
-    ueventd.qcom.rc
+    ueventd.qcom.rc \
+    init.qcom.power.rc
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PACKAGES += \
@@ -277,7 +283,6 @@ PRODUCT_PACKAGES += \
     libQWiFiSoftApCfg \
     libwpa_client \
     hostapd \
-    dhcpcd.conf \
     wpa_supplicant \
     wpa_supplicant.conf
 

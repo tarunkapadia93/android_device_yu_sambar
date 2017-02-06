@@ -21,8 +21,13 @@ endif
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, device/yu/sambar/device.mk)
 
-PRODUCT_NAME := full_sambar
+# Inherit some common Custom stuff.
+$(call inherit-product, vendor/aosp/common.mk)
+
+PRODUCT_NAME := aosp_sambar
 PRODUCT_DEVICE := sambar
 PRODUCT_BRAND := YU
 PRODUCT_MODEL := YU5050
 PRODUCT_MANUFACTURER := YU
+
+$(call inherit-product-if-exists, vendor/yu/sambar/sambar-vendor.mk)

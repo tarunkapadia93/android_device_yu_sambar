@@ -20,8 +20,8 @@ LOCAL_SHARED_LIBRARIES := \
 	liblog libtinyalsa libdl libcutils
 
 LOCAL_C_FLAGS += -DPLATFORM_MSM8994
-LOCAL_C_INCLUDES += $(call project-path-for,qcom-audio)/hal
-LOCAL_C_INCLUDES += $(call project-path-for,qcom-audio)/hal/audio_extn
+LOCAL_C_INCLUDES += hardware/qcom/audio-caf-msm8992/hal
+LOCAL_C_INCLUDES += hardware/qcom/audio-caf-msm8992/hal/audio_extn
 LOCAL_C_INCLUDES += external/tinyalsa/include
 LOCAL_C_INCLUDES += external/tinycompress/include
 LOCAL_C_INCLUDES += $(call include-path-for, audio-route)

@@ -15,7 +15,8 @@
 #
 
 LOCAL_PATH := $(call my-dir)
-
 ifeq ($(TARGET_DEVICE),sambar)
+ifeq ($(USE_DEVICE_SPECIFIC_GPS),true)
 include $(call all-subdir-makefiles,$(LOCAL_PATH))
+endif
 endif

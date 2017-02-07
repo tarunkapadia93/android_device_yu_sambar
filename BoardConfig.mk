@@ -195,9 +195,6 @@ TARGET_USERIMAGES_USE_EXT4 := true
 # RIL
 FEATURE_QCRIL_UIM_SAP_SERVER_MODE := true
 
-# Seccomp filters
-BOARD_SECCOMP_POLICY += $(DEVICE_PATH)/seccomp
-
 # SELinux
 include device/qcom/sepolicy/sepolicy.mk
 

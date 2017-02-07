@@ -24,6 +24,7 @@ LOCAL_C_INCLUDES += $(call project-path-for,qcom-audio)/hal
 LOCAL_C_INCLUDES += $(call project-path-for,qcom-audio)/hal/audio_extn
 LOCAL_C_INCLUDES += external/tinyalsa/include
 LOCAL_C_INCLUDES += external/tinycompress/include
+LOCAL_C_INCLUDES += device/qcom/common/audio_amplifier/include
 LOCAL_C_INCLUDES += $(call include-path-for, audio-route)
 
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include

@@ -24,6 +24,7 @@ LOCAL_C_INCLUDES += hardware/qcom/audio-caf-msm8992/hal
 LOCAL_C_INCLUDES += hardware/qcom/audio-caf-msm8992/hal/audio_extn
 LOCAL_C_INCLUDES += external/tinyalsa/include
 LOCAL_C_INCLUDES += external/tinycompress/include
+LOCAL_C_INCLUDES += device/qcom/common/audio_amplifier/include
 LOCAL_C_INCLUDES += $(call include-path-for, audio-route)
 
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include

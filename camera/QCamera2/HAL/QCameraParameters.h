@@ -166,10 +166,8 @@ public:
     static const char KEY_QC_SUPPORTED_MEM_COLOR_ENHANCE_MODES[];
     static const char KEY_QC_DIS[];
     static const char KEY_QC_OIS[];
-    static const char KEY_QC_PDAF[];
     static const char KEY_QC_SUPPORTED_DIS_MODES[];
     static const char KEY_QC_SUPPORTED_OIS_MODES[];
-    static const char KEY_QC_SUPPORTED_PDAF_MODES[];
 
     static const char KEY_QC_ZSL[];
     static const char KEY_QC_SUPPORTED_ZSL_MODES[];
@@ -667,12 +665,11 @@ public:
     int32_t updateRAW(cam_dimension_t max_dim);
     bool isAVTimerEnabled();
     bool isDISEnabled();
-    bool isPDAFEnabled() {return m_bPDAFEnabled;};
     cam_is_type_t getISType();
     uint8_t getMobicatMask();
-    bool getPDAFValue() {return m_bPDAFEnabled;};
 
     cam_focus_mode_type getFocusMode() const {return mFocusMode;};
+    bool isAFRunning();
     int32_t setNumOfSnapshot();
     int32_t adjustPreviewFpsRange(cam_fps_range_t *fpsRange);
     bool isJpegPictureFormat() {return (mPictureFormat == CAM_FORMAT_JPEG);};
@@ -746,7 +743,6 @@ public:
     int32_t updateDebugLevel();
     bool is4k2kVideoResolution();
     int getBrightness();
-    int32_t checkPDAFmode();
     int32_t updateOisValue(bool oisValue);
     int32_t setIntEvent(cam_int_evt_params_t params);
     void setOfflineRAW();
@@ -784,7 +780,8 @@ public:
             { return m_captureFrameConfig; };
     void setJpegRotation(int rotation);
     uint32_t getJpegRotation() { return mJpegRotation;};
-
+    void setFocusState(cam_autofocus_state_t focusState) { mFocusState = focusState; };
+    cam_autofocus_state_t getFocusState() { return mFocusState; };
 private:
     int32_t setPreviewSize(const QCameraParameters& );
     int32_t setVideoSize(const QCameraParameters& );
@@ -820,8 +817,6 @@ private:
     int32_t setAwbLock(const QCameraParameters& );
     int32_t setMCEValue(const QCameraParameters& );
     int32_t setDISValue(const QCameraParameters& params);
-    int32_t setOISValue(const QCameraParameters& params);
-    int32_t setPDAF(const QCameraParameters& params);
     int32_t setLensShadeValue(const QCameraParameters& );
     int32_t setExposureCompensation(const QCameraParameters& );
     int32_t setWhiteBalance(const QCameraParameters& );
@@ -888,8 +883,6 @@ private:
     int32_t setAwbLock(const char *awbStr);
     int32_t setMCEValue(const char *mceStr);
     int32_t setDISValue(const char *disStr);
-    int32_t setOISValue(const char *oisStr);
-    int32_t setPDAF(const char *oisStr);
     int32_t setHighFrameRate(const int32_t hfrMode);
     int32_t setLensShadeValue(const char *lensShadeStr);
     int32_t setExposureCompensation(int expComp);
@@ -948,8 +941,6 @@ private:
     // ops to tempororily update parameter entries and commit
     int32_t updateParamEntry(const char *key, const char *value);
     int32_t commitParamChanges();
-    void updateViewAngles();
-    void reduceLiveSnapshotSize(const QCameraParameters& params, const cam_dimension_t size);
 
     // Map from strings to values
     static const cam_dimension_t THUMBNAIL_SIZES_MAP[];
@@ -1018,14 +1009,12 @@ private:
     bool m_bSnapshotFlipChanged;       // if flip setting for snapshot changed
     bool m_bFixedFrameRateSet;      // Indicates that a fixed frame rate is set
     qcamera_thermal_mode m_ThermalMode; // adjust fps vs adjust frameskip
-    cam_dimension_t m_VideoPictureSize; //reduce livesnapshot size for video recording
     cam_dimension_t m_LiveSnapshotSize; // live snapshot size
     cam_dimension_t m_rawSize; // live snapshot size
     bool m_bHDREnabled;             // if HDR is enabled
     bool m_bAVTimerEnabled;    //if AVTimer is enabled
     bool m_bDISEnabled;
     bool m_bOISEnabled;
-    bool m_bPDAFEnabled;
     cam_still_more_t m_stillmore_config;
 
     uint8_t m_MobiMask;
@@ -1044,7 +1033,6 @@ private:
     bool m_bSceneSelection;
     Mutex m_SceneSelectLock;
     cam_scene_mode_type m_SelectedScene;
-    cam_scene_mode_type m_SetScene;
     bool m_bSeeMoreOn;
     bool m_bStillMoreOn;
     cam_fps_range_t m_hfrFpsRange;
@@ -1077,6 +1065,7 @@ private:
 
     uint32_t mRotation;
     uint32_t mJpegRotation;
+    cam_autofocus_state_t mFocusState;
 };
 
 }; // namespace qcamera

@@ -1,0 +1,3 @@
+#============= system_server ==============
+allow system_server touchscreen_file:file { read write open };
+

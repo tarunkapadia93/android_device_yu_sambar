@@ -1,4 +1,5 @@
 #============= kernel ==============
+allow kernel bluetooth:process setsched;
 allow kernel debuggerd:process setsched;
 allow kernel gatekeeperd:process setsched;
 allow kernel lmkd:process setsched;

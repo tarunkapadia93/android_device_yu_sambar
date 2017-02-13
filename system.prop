@@ -35,7 +35,7 @@ qcom.bluetooth.soc=rome
 
 # Camera
 persist.camera.hal.debug.mask=268435456
-persist.camera.HAL3.enabled=0
+persist.camera.HAL3.enabled=1
 persist.camera.gyro.android=1
 media.stagefright.legacyencoder=true
 media.stagefright.less-secure=true

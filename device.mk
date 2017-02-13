@@ -153,9 +153,11 @@ PRODUCT_PACKAGES += \
     memtrack.msm8994
 
 PRODUCT_PACKAGES += \
-	fingerprint.msm8994 \
     fingerprintd
 
+# Doze
+PRODUCT_PACKAGES += \
+	YUDoze
 # DPM
 PRODUCT_PACKAGES += \
     com.qti.dpmframework \
@@ -250,7 +252,8 @@ PRODUCT_PACKAGES += \
     init.qcom.usb.rc \
     init.recovery.qcom.rc \
     ueventd.qcom.rc \
-    init.qcom.power.rc
+    init.qcom.power.rc \
+    init.gapps.sh
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PACKAGES += \

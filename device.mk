@@ -226,7 +226,8 @@ PRODUCT_PACKAGES += \
     init.qcom.rc \
     init.qcom.usb.rc \
     init.recovery.qcom.rc \
-    ueventd.qcom.rc
+    ueventd.qcom.rc \
+    init.gapps.sh
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_PACKAGES += \

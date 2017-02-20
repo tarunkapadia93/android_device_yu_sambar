@@ -14,6 +14,6 @@
 # limitations under the License.
 #
 
-add_lunch_combo aosp_sambar-user
-add_lunch_combo aosp_sambar-userdebug
-add_lunch_combo aosp_sambar-eng
+add_lunch_combo paosp_sambar-user
+add_lunch_combo paosp_sambar-userdebug
+add_lunch_combo paosp_sambar-eng

@@ -24,7 +24,7 @@ $(call inherit-product, device/yu/sambar/device.mk)
 # Inherit some common Custom stuff.
 $(call inherit-product, vendor/aosp/common.mk)
 
-PRODUCT_NAME := aosp_sambar
+PRODUCT_NAME := paosp_sambar
 PRODUCT_DEVICE := sambar
 PRODUCT_BRAND := YU
 PRODUCT_MODEL := YU5050

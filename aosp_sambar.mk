@@ -24,8 +24,6 @@ $(call inherit-product, device/yu/sambar/device.mk)
 # Inherit some common Custom stuff.
 $(call inherit-product, vendor/aosp/common.mk)
 
-TARGET_OTA_ASSERT_DEVICE := sambar,YUTOPIA
-
 PRODUCT_NAME := aosp_sambar
 PRODUCT_DEVICE := sambar
 PRODUCT_BRAND := YU

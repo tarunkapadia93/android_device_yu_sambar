@@ -4,6 +4,20 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
+# QCameraParameters.h has unused private field.
+# QCamera2Hal.cpp, QCamera3HWI.cpp, etc. use GNU old-style field designator extension.
+# QCamera3PostProc.cpp has unused label.
+# QCamera3HWI.cpp, QCamera3PostProc.cpp etc. have unused variable.
+# QCamera3Channel.cpp compares array to null pointer.
+# QCamera2Factory.cpp, QCamera3HWI.cpp, etc. have unused parameter.
+LOCAL_CLANG_CFLAGS += \
+        -Wno-error=unused-private-field \
+        -Wno-error=gnu-designator \
+        -Wno-error=unused-label \
+        -Wno-error=unused-variable \
+        -Wno-error=unused-parameter \
+        -Wno-error=tautological-pointer-compare \
+
 LOCAL_SRC_FILES := \
         util/QCameraCmdThread.cpp \
         util/QCameraQueue.cpp \
@@ -39,6 +53,11 @@ ifeq ($(TARGET_USES_AOSP),true)
 LOCAL_CFLAGS += -DVANILLA_HAL
 endif
 
+#use media extension
+ifeq ($(TARGET_USES_MEDIA_EXTENSIONS), true)
+LOCAL_CFLAGS += -DUSE_MEDIA_EXTENSIONS
+endif
+
 #HAL 1.0 Flags
 LOCAL_CFLAGS += -DDEFAULT_DENOISE_MODE_ON -DHAL3
 
@@ -46,7 +65,7 @@ LOCAL_C_INCLUDES := \
         $(LOCAL_PATH)/stack/common \
         frameworks/native/include/media/hardware \
         frameworks/native/include/media/openmax \
-        $(call project-path-for,qcom-media)/libstagefrighthw \
+        hardware/qcom/media-caf-msm8992/libstagefrighthw \
         system/media/camera/include \
         $(LOCAL_PATH)/../mm-image-codec/qexif \
         $(LOCAL_PATH)/../mm-image-codec/qomx_core \
@@ -55,19 +74,20 @@ LOCAL_C_INCLUDES := \
 #HAL 1.0 Include paths
 LOCAL_C_INCLUDES += \
         frameworks/native/include/media/hardware \
-        $(call project-path-for,qcom-camera)/QCamera2/HAL
+        device/yu/sambar/camera/QCamera2/HAL
 
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 #LOCAL_STATIC_LIBRARIES := libqcamera2_util
 LOCAL_C_INCLUDES += \
-        $(TARGET_OUT_HEADERS)/qcom/display
+        $(TARGET_OUT_HEADERS)/qcom/display-caf-msm8992
 
 LOCAL_SHARED_LIBRARIES := libcamera_client liblog libhardware libutils libcutils libdl
 LOCAL_SHARED_LIBRARIES += libmmcamera_interface libmmjpeg_interface libui libcamera_metadata
 LOCAL_SHARED_LIBRARIES += libqdMetaData
 
+LOCAL_CLANG := false
 LOCAL_MODULE_RELATIVE_PATH := hw
 LOCAL_MODULE := camera.$(TARGET_BOARD_PLATFORM)
 LOCAL_MODULE_TAGS := optional

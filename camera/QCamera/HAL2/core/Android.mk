@@ -53,8 +53,8 @@ LOCAL_C_INCLUDES := \
         $(LOCAL_PATH)/../../stack/mm-jpeg-interface/inc\
         $(TARGET_OUT_INTERMEDIATES)/include/mm-camera-interface_badger \
 
-LOCAL_C_INCLUDES += $(TARGET_OUT_HEADERS)/display \
-        $(call project-path-for,qcom-media)/libstagefrighthw \
+LOCAL_C_INCLUDES += $(TARGET_OUT_HEADERS)/display-caf-msm8992 \
+        hardware/qcom/media-caf-msm8992/libstagefrighthw \
 	system/media/camera/include
 
 # if debug service layer and up , use stub camera!

@@ -17,6 +17,10 @@ endif
 
 LOCAL_CFLAGS += -D_ANDROID_
 
+# mm_qcamera_main_menu.c has implicit conversion from enum to enum.
+LOCAL_CLANG_CFLAGS += \
+        -Wno-error=enum-conversion \
+
 LOCAL_SRC_FILES:= \
         src/mm_qcamera_main_menu.c \
         src/mm_qcamera_app.c \
@@ -114,6 +118,7 @@ LOCAL_CFLAGS += -Wall -Wextra -Werror
 LOCAL_SHARED_LIBRARIES:= \
          libcutils libdl libmmcamera_interface
 
+LOCAL_CLANG       := false
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_32_BIT_ONLY := $(BOARD_QTI_CAMERA_32BIT_ONLY)
@@ -136,6 +141,10 @@ LOCAL_CFLAGS += -DUSE_ION
 endif
 
 LOCAL_CFLAGS += -D_ANDROID_
+
+# mm_qcamera_main_menu.c has implicit conversion from enum to enum.
+LOCAL_CLANG_CFLAGS += \
+        -Wno-error=enum-conversion \
 
 LOCAL_SRC_FILES:= \
         src/mm_qcamera_main_menu.c \
@@ -222,6 +231,7 @@ LOCAL_CFLAGS += -Wall -Wextra -Werror
 LOCAL_SHARED_LIBRARIES:= \
          libcutils libdl libmmcamera_interface
 
+LOCAL_CLANG       := false
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_32_BIT_ONLY := $(BOARD_QTI_CAMERA_32BIT_ONLY)

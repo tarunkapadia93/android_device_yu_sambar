@@ -94,19 +94,10 @@ PRODUCT_PACKAGES += \
     com.dsi.ant.antradio_library \
     libantradio
 
-# Browser
-PRODUCT_PACKAGES += \
-    Gello
-
 # Camera
 PRODUCT_PACKAGES += \
     camera.msm8994 \
-    libmm-qcamera \
-    Snap
-
-# Charger
-PRODUCT_PACKAGES += \
-    charger_res_images
+    libmm-qcamera
 
 # Connectivity Engine support (CNE)
 PRODUCT_PACKAGES += \
@@ -135,8 +126,6 @@ PRODUCT_PACKAGES += \
     libtinyxml \
     memtrack.msm8994
 
-PRODUCT_PROPERTY_OVERRIDES += \
-    dalvik.vm.heapgrowthlimit=256m
 
 PRODUCT_PACKAGES += \
     fingerprint.msm8994 \
@@ -149,9 +138,8 @@ PRODUCT_PACKAGES += \
 
 # FM
 PRODUCT_PACKAGES += \
-    FM2 \
-    libqcomfm_jni \
-    qcom.fmradio
+    FMRadio \
+    libfm_jni
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -171,16 +159,6 @@ PRODUCT_COPY_FILES += \
 # IRSC
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sec_config:system/etc/sec_config
-
-# Keyhandler/Gestures
-PRODUCT_PACKAGES += \
-    com.cyanogenmod.keyhandler \
-    ConfigPanel
-
-PRODUCT_SYSTEM_SERVER_JARS += com.cyanogenmod.keyhandler
-
-# never dexopt the keyhandler
-$(call add-product-dex-preopt-module-config,com.cyanogenmod.keyhandler,disable)
 
 # Keylayout
 PRODUCT_COPY_FILES += \
@@ -277,7 +255,6 @@ PRODUCT_PACKAGES += \
     libQWiFiSoftApCfg \
     libwpa_client \
     hostapd \
-    dhcpcd.conf \
     wpa_supplicant \
     wpa_supplicant.conf
 

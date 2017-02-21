@@ -21,8 +21,17 @@ endif
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, device/yu/sambar/device.mk)
 
-PRODUCT_NAME := full_sambar
+PRODUCT_NAME := paosp_sambar
 PRODUCT_DEVICE := sambar
 PRODUCT_BRAND := YU
 PRODUCT_MODEL := YU5050
 PRODUCT_MANUFACTURER := YU
+
+PRODUCT_GMS_CLIENTID_BASE := android-micromax
+
+TARGET_VENDOR_PRODUCT_NAME := YUTOPIA
+TARGET_VENDOR_DEVICE_NAME := YUTOPIA
+PRODUCT_BUILD_PROP_OVERRIDES += TARGET_DEVICE=YUTOPIA PRODUCT_NAME=YUTOPIA
+
+# Ringtones
+TARGET_NEEDS_BOOSTED_SOUNDS := true

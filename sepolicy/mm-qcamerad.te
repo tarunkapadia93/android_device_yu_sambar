@@ -2,4 +2,3 @@
 allow mm-qcamerad mpctl_socket:sock_file write;
 allow mm-qcamerad perfd:unix_stream_socket connectto;
 allow mm-qcamerad package_service:service_manager find;
-allow mm-qcamerad permission_service:service_manager find;

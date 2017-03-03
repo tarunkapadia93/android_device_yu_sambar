@@ -248,11 +248,12 @@ PRODUCT_PACKAGES += \
     init.qcom.bt.sh \
     init.qcom.coex.sh \
     init.qcom.fm.sh \
-    init.qcom.post_boot.sh
+    init.qcom.power.sh
 
 PRODUCT_PACKAGES += \
     fstab.qcom \
     init.qcom.rc \
+    init.qcom.power.rc \
     init.qcom.usb.rc \
     init.recovery.qcom.rc \
     ueventd.qcom.rc \
